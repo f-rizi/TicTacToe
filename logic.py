@@ -1,10 +1,13 @@
 class TicTacToe:
-    def __init__(self):
-        self.board = [[".", ".", "."],
-                      [".", ".", "."],
-                      [".", ".", "."]]
+    def __init__(self, size):
+        self.size = size
+        self.reset()
+
+    def reset(self):
+        self.board = [['.'] * self.size for i in range(self.size)]
 
         self.player = 0
+
 
     def click(self, row, column):
         if not self.have_empty_cell():
@@ -32,16 +35,16 @@ class TicTacToe:
             return "player %d is the winner" % self.get_player()
 
     def have_empty_cell(self):
-        for i in range(3):
+        for i in range(self.size):
             if "." in self.board[i]:
                 return True
 
     def get_winner(self):
         results = self.get_results()
 
-        if ["X", "X", "X"] in results:
+        if ["X"] * self.size in results:
             return 1
-        elif ["O", "O", "O"] in results:
+        elif ["O"] * self.size in results:
             return 2
 
         return 0
@@ -49,32 +52,15 @@ class TicTacToe:
     def get_results(self):
         result = []
 
-        result.append([self.board[0][0],
-                       self.board[1][1],
-                       self.board[2][2]])
+        result.append([self.board[i][i] for i in range(self.size)])
 
-        result.append([self.board[0][2],
-                       self.board[1][1],
-                       self.board[2][0]])
+        result.append([self.board[self.size - i - 1][i] for i in range(self.size)])
 
-        for i in range(3):
-            result.append([self.board[i][0],
-                           self.board[i][1],
-                           self.board[i][2]])
+        for i in range(self.size):
+            result.append([self.board[i][j] for j in range(self.size)])
 
-            result.append([self.board[0][i],
-                           self.board[1][i],
-                           self.board[2][i]])
+            result.append([self.board[j][i] for j in range(self.size)])
         return result
 
     def get_player(self):
         return self.player + 1
-
-    def print_board(self):
-        for i in range(3):
-            print(self.board[i])
-
-    def print_result(self, result):
-        print "result is: "
-        for i in range(8):
-            print(result[i])

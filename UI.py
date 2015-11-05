@@ -2,67 +2,66 @@ import tkMessageBox
 from Tkinter import *
 from logic import TicTacToe
 
-root = Tk()
-game = TicTacToe()
+class TicTacToeTk:
+    def __init__(self, size):
+        self.size = size
+        self.game = TicTacToe(size)
+        self.root = self.create_root_window()
+        self.grid = self.create_grid()
 
-grid = [
-    [StringVar(), StringVar(), StringVar()],
-    [StringVar(), StringVar(), StringVar()],
-    [StringVar(), StringVar(), StringVar()]
-]
+        b = Button(self.root, text="New Game",
+                   command=self.on_click_new_game)
+        b.grid(row=self.size, column=1)
 
-root.resizable(width=FALSE, height=FALSE)
-root.wm_title("TicTacToe, Player " + str(game.get_player()) + " select a cell")
+    def run(self):
+        self.root.mainloop()
 
+    def create_root_window(self):
+        root = Tk()
+        root.resizable(width=FALSE, height=FALSE)
+        return root
 
-def new_game():
-    global game
-    global grid
+    def create_grid(self):
+        grid = [[
+            StringVar() for j in range(self.size)
+        ] for i in range(self.size)]
 
-    game = TicTacToe()
-    update_title()
+        colors = ["white", "gray"]
+        for i in range(self.size):
+            for j in range(self.size):
+                label = Label(self.root,
+                              bg=colors[(i + j) % 2],
+                              fg=colors[(i + j + 1) % 2],
+                              height=5, width=15,
+                              textvariable=grid[i][j])
+                label.bind('<Button-1>',
+                           lambda event, r=i, c=j: self.on_click_cell(r, c))
 
-    for i in range(3):
-        for j in range(3):
-            grid[i][j].set(' ')
+                label.grid(row=i, column=j)
 
+        return grid
 
-def update_title(message=None):
-    if message is None:
-        root.wm_title("TicTacToe, Player " +
-                      str(game.get_player()) +
-                      " select a cell")
-    else:
-        root.wm_title(message)
+    def on_click_new_game(self):
+        self.game.reset()
+        self.update_view()
 
+    def on_click_cell(self, row, column):
+        self.game.click(row, column)
+        self.update_view()
+        winner = self.game.get_winner()
+        if winner != 0:
+            tkMessageBox.showinfo("Winner",
+                                  "Player %d is the winner!" % winner)
+        elif not self.game.have_empty_cell():
+            tkMessageBox.showinfo("Draw",
+                                  "Game ended without a winner!")
 
-def label_click(event, row, column):
-    message = game.click(row, column)
+    def update_view(self):
+        for i in range(self.size):
+            for j in range(self.size):
+                if self.game.board[i][j] != '.':
+                    self.grid[i][j].set(self.game.board[i][j])
+                else:
+                    self.grid[i][j].set('')
 
-    update_title(message)
-
-    for i in range(3):
-        for j in range(3):
-            if game.board[i][j] != '.':
-                grid[i][j].set(game.board[i][j])
-
-    if game.get_winner() != 0:
-        tkMessageBox.showinfo("Winner", "player %d is the winner"
-                              % game.get_player())
-
-
-colors = ["white", "gray"]
-for i in range(3):
-    for j in range(3):
-        label = Label(root, bg=colors[0], fg=colors[1], height=5, width=15,
-                      textvariable=grid[i][j])
-        label.bind('<Button-1>',
-                   lambda event, r=i, c=j: label_click(event, r, c))
-
-        label.grid(row=i, column=j)
-        colors.reverse()
-
-b = Button(root, text="New Game", command=new_game)
-b.grid(row=3, column=1)
-
-root.mainloop()
+TicTacToeTk(4).run()
