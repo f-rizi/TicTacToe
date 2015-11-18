@@ -2,6 +2,7 @@ import tkMessageBox
 from Tkinter import *
 from logic import TicTacToe
 
+
 class TicTacToeTk:
     def __init__(self, size):
         self.size = size
@@ -9,7 +10,7 @@ class TicTacToeTk:
         self.root = self.create_root_window()
         self.grid = self.create_grid()
 
-        b = Button(self.root, text="New Game",
+        b = Button(self.root, text=":)",
                    command=self.on_click_new_game)
         b.grid(row=self.size, column=1)
 
@@ -27,12 +28,13 @@ class TicTacToeTk:
         ] for i in range(self.size)]
 
         colors = ["white", "gray"]
+
         for i in range(self.size):
             for j in range(self.size):
                 label = Label(self.root,
                               bg=colors[(i + j) % 2],
                               fg=colors[(i + j + 1) % 2],
-                              height=5, width=15,
+                              height=3, width=8,
                               textvariable=grid[i][j])
                 label.bind('<Button-1>',
                            lambda event, r=i, c=j: self.on_click_cell(r, c))
